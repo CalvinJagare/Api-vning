@@ -14,7 +14,7 @@
     <input type="text" @bind="broprompt" />
 </div>
 
-<button @onclick="GetCompletionAsync(broprompt)"></button>
+<button class="btn" @onclick="send"></button>
 
 @code {
     private static readonly string baseUrl = "https://api.aimlapi.com/v1";
@@ -54,5 +54,10 @@
 
         ChatCompletionResponse jsonResponse = JsonSerializer.Deserialize<ChatCompletionResponse>(await response.Content.ReadAsStringAsync());
         brogrammer = jsonResponse.Choices[0].Message.Content;
+    }
+
+    private async Task send()
+    {
+        await GetCompletionAsync(broprompt);
     }
 }
