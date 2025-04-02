@@ -2,19 +2,18 @@
 @using System.Text.Json
 @using System.Text
 
-<h3>Brogrammer</h3>
+<div class="chat-container">
+    <div class="chat-header">Brogrammer</div>
 
-<div>
-    <label>Brogrammer: </label>
-    <p @bind="brogrammer"></p>
+    <div class="chat-messages">
+        <p>@brogrammer</p>
+    </div>
+
+    <div class="chat-input-container">
+        <input class="chat-input" type="text" @bind="broprompt" placeholder="Ask Brogrammer a question..." />
+        <button class="chat-button" @onclick="send">Send</button>
+    </div>
 </div>
-
-<div>
-    <label>Ask Brogrammer A Question:</label>
-    <input type="text" @bind="broprompt" />
-</div>
-
-<button class="btn" @onclick="send"></button>
 
 @code {
     private static readonly string baseUrl = "https://api.aimlapi.com/v1";
@@ -44,7 +43,7 @@
 
         string jsonRequest = JsonSerializer.Serialize(requestBody);
         var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
-        
+
         HttpResponseMessage response = await client.PostAsync($"{baseUrl}/chat/completions", content);
 
         if (!response.IsSuccessStatusCode)
@@ -60,4 +59,5 @@
     {
         await GetCompletionAsync(broprompt);
     }
+    
 }
