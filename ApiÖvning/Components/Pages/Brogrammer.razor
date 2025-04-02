@@ -1,6 +1,7 @@
 ﻿@page "/brogrammer"
 @using System.Text.Json
 @using System.Text
+@inject HttpClient Http
 
 <div class="chat-container">
     <div class="chat-header">Brogrammer</div>
@@ -12,22 +13,27 @@
     <div class="chat-input-container">
         <input class="chat-input" type="text" @bind="broprompt" placeholder="Ask Brogrammer a question..." />
         <button class="chat-button" @onclick="send">Send</button>
+        <button @onclick="test">Test Button</button>
     </div>
 </div>
 
 @code {
-    private static readonly string baseUrl = "https://api.aimlapi.com/v1";
-    private static readonly string apiKey = "358d65632eb54e35a423f0e746903c9f";
+    private readonly string baseUrl = "https://api.aimlapi.com/v1";
+    private readonly string apiKey = "358d65632eb54e35a423f0e746903c9f";
 
     string broprompt;
-    static string brogrammer;
+    string brogrammer;
 
-    public static async Task GetCompletionAsync(string broprompt)
+    protected override void OnInitialized()
+    {
+        Console.WriteLine("Brogrammer component initialized");
+    }
+
+    private async Task GetCompletionAsync()
     {
         string systemPrompt = "You are an expert on C# but only speak like a fratboy";
 
-        using HttpClient client = new HttpClient();
-        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
+        Http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", apiKey);
 
         var requestBody = new
         {
@@ -44,20 +50,32 @@
         string jsonRequest = JsonSerializer.Serialize(requestBody);
         var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
 
-        HttpResponseMessage response = await client.PostAsync($"{baseUrl}/chat/completions", content);
+        HttpResponseMessage response = await Http.PostAsync($"{baseUrl}/chat/completions", content);
 
         if (!response.IsSuccessStatusCode)
         {
-            throw new Exception($"Error: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}");
+            brogrammer = $"Error: {response.StatusCode} - {await response.Content.ReadAsStringAsync()}";
+            return;
         }
 
         ChatCompletionResponse jsonResponse = JsonSerializer.Deserialize<ChatCompletionResponse>(await response.Content.ReadAsStringAsync());
         brogrammer = jsonResponse.Choices[0].Message.Content;
+        StateHasChanged();
     }
 
     private async Task send()
     {
-        await GetCompletionAsync(broprompt);
+        Console.WriteLine("Send button clicked");
+        if (string.IsNullOrWhiteSpace(broprompt))
+        {
+            Console.WriteLine("Prompt is empty");
+            return;
+        }
+        await GetCompletionAsync();
     }
-    
+
+    private void test()
+    {
+        Console.WriteLine("Test button clicked");
+    }
 }
