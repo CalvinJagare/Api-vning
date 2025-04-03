@@ -1,6 +1,9 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@inject IJSRuntime JS
+@rendermode InteractiveServer
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">ApiÖvning</a>
+        <a class="navbar-brand" href="">Brogrammer</a>
     </div>
 </div>
 
@@ -15,14 +18,54 @@
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="brogrammer">
-                <span class="bi bi-calculator-fill-nav-menu" aria-hidden="true"></span> Brogrammer
+                <span class="bi bi-person-raised-hand" aria-hidden="true"></span> Brogrammer
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-gear-fill-nav-menu" aria-hidden="true"></span> Counter
-            </NavLink>
+            <button class="btn btn-secondary" @onclick="ToggleDarkMode">
+                @(isDarkMode ? "Light Mode" : "Dark Mode")
+            </button>
         </div>
     </nav>
 </div>
 
+<script>
+    window.toggleDarkMode = function (isDarkMode) {
+        if (isDarkMode) {
+            document.body.classList.add('dark-mode');
+            localStorage.setItem('darkMode', 'true');
+        } else {
+            document.body.classList.remove('dark-mode');
+            localStorage.setItem('darkMode', 'false');
+        }
+    };
+
+    window.loadDarkMode = function () {
+        const darkMode = localStorage.getItem('darkMode') === 'true';
+        if (darkMode) {
+            document.body.classList.add('dark-mode');
+        } else {
+            document.body.classList.remove('dark-mode');
+        }
+        return darkMode;
+    };
+</script>
+
+@code {
+    private bool isDarkMode = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            isDarkMode = await JS.InvokeAsync<bool>("loadDarkMode");
+            StateHasChanged();
+        }
+    }
+
+    private async Task ToggleDarkMode()
+    {
+        isDarkMode = !isDarkMode;
+        await JS.InvokeVoidAsync("toggleDarkMode", isDarkMode);
+    }
+}

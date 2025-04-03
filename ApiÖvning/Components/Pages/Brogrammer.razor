@@ -14,15 +14,14 @@
     <div class="chat-input-container">
         <input class="chat-input" type="text" @bind="broprompt" placeholder="Ask Brogrammer a question..." />
         <button class="chat-button" @onclick="Send">Send</button>
-        <button class="btn btn-primary" @onclick="Test">Test Button</button>
     </div>
 </div>
 
 @code {
     private readonly string baseUrl = "https://api.aimlapi.com/v1";
-    private readonly string apiKey = "358d65632eb54e35a423f0e746903c9f";
+    private readonly string apiKey = "eb9809d54a2e4063a3c5b19fec64edcb";
 
-    string broprompt = "Whats a loop?";
+    string broprompt;
     string brogrammer = "Whats up Bro?";
 
     protected override void OnInitialized()
@@ -43,7 +42,7 @@
 
     private async Task GetCompletionAsync()
     {
-        string systemPrompt = "You are an expert on C# but only speak like a fratboy";
+        string systemPrompt = "You are an expert on C# but you have genreal knowledge about all coding, but only speak like a fratboy. AVOID WRITING ANY CODE EXAMPLES AT ALL EVEN IF ASKED!!!!!!! use variations of bro as much as possible bro";
 
         Http.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", apiKey);
 
